@@ -4,77 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HealthTrack BMI</title>
+
+    <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root {
-            --primary: #6366f1;
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --accent-green: #22c55e;
-            --accent-yellow: #eab308;
-            --accent-orange: #f97316;
-            --accent-red: #ef4444;
-        }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; overflow-x: hidden; }
-
-        /* Navigation */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: var(--card-bg); display: flex; justify-content: space-around;
-            align-items: center; border-top: 1px solid #334155; z-index: 100;
-        }
-        .nav-item { color: var(--text-dim); display: flex; flex-direction: column; align-items: center; font-size: 12px; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--primary); }
-
-        /* Screens */
-        .screen { display: none; padding: 20px; padding-bottom: 90px; min-height: 100vh; animation: fadeIn 0.4s ease; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* UI Components */
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        h1 { font-size: 24px; margin-bottom: 20px; font-weight: 600; }
-        
-        /* Input Groups */
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .input-card { background: #334155; padding: 15px; border-radius: 15px; text-align: center; }
-        .label { color: var(--text-dim); font-size: 14px; margin-bottom: 8px; display: block; }
-        .value { font-size: 28px; font-weight: bold; border: none; background: transparent; color: white; width: 80px; text-align: center; outline: none; }
-        
-        .toggle-group { display: flex; background: #0f172a; border-radius: 10px; padding: 4px; margin-top: 10px; }
-        .toggle-btn { flex: 1; padding: 6px; border-radius: 8px; font-size: 12px; cursor: pointer; border: none; background: transparent; color: var(--text-dim); }
-        .toggle-btn.active { background: var(--primary); color: white; }
-
-        /* Age Slider */
-        .slider-container { padding: 10px 0; }
-        input[type=range] { width: 100%; accent-color: var(--primary); }
-
-        /* Buttons */
-        .btn-main { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--primary); color: white; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
-
-        /* Result Styles */
-        .result-circle { width: 180px; height: 180px; border-radius: 50%; border: 12px solid var(--accent-green); margin: 30px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        .bmi-val { font-size: 42px; font-weight: 800; }
-        .bmi-cat { font-size: 18px; color: var(--accent-green); font-weight: 600; }
-
-        /* Chart Containers */
-        .chart-container { height: 250px; margin-top: 15px; }
-        .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-top: 10px; }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-    </style>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="calc-screen" class="screen active">
         <h1>BMI Calculator</h1>
-        
+
         <div class="input-row">
             <div class="input-card" id="gender-male" onclick="setGender('male')">
                 <i data-lucide="mars" style="color: #60a5fa"></i>
@@ -132,25 +74,27 @@
                 <span class="bmi-val" id="res-value">22.5</span>
                 <span class="bmi-cat" id="res-category">Normal</span>
             </div>
-            <p id="res-desc" style="color: var(--text-dim); line-height: 1.6;">You have a healthy body weight. Good job!</p>
+            <p id="res-desc" style="color: var(--text-dim); line-height: 1.6;">
+                You have a healthy body weight. Good job!
+            </p>
         </div>
 
         <div class="card">
             <span class="label">BMI Categories</span>
             <div class="legend-grid">
-                <div class="legend-item"><span class="dot" style="background: #60a5fa"></span> < 18.5 (Underweight)</div>
-                <div class="legend-item"><span class="dot" style="background: #22c55e"></span> 18.5 - 25 (Normal)</div>
-                <div class="legend-item"><span class="dot" style="background: #eab308"></span> 25 - 30 (Overweight)</div>
-                <div class="legend-item"><span class="dot" style="background: #ef4444"></span> > 30 (Obese)</div>
+                <div class="legend-item"><span class="dot" style="background:#60a5fa"></span> &lt; 18.5</div>
+                <div class="legend-item"><span class="dot" style="background:#22c55e"></span> 18.5 - 25</div>
+                <div class="legend-item"><span class="dot" style="background:#eab308"></span> 25 - 30</div>
+                <div class="legend-item"><span class="dot" style="background:#ef4444"></span> &gt; 30</div>
             </div>
         </div>
-        
+
         <button class="btn-main" onclick="saveRecord()">SAVE DATA</button>
     </div>
 
     <div id="stats-screen" class="screen">
         <h1>Statistics</h1>
-        
+
         <div class="card">
             <span class="label">Weight Trend (kg)</span>
             <div class="chart-container">
@@ -177,121 +121,7 @@
         </div>
     </nav>
 
-    <script>
-        // State Management
-        let gender = 'male';
-        let units = { height: 'cm', weight: 'kg' };
-        let history = JSON.parse(localStorage.getItem('healthHistory')) || [];
-
-        // Initialization
-        lucide.createIcons();
-        updateAge(25);
-        
-        function setGender(g) {
-            gender = g;
-            document.getElementById('gender-male').style.border = g === 'male' ? '2px solid var(--primary)' : 'none';
-            document.getElementById('gender-female').style.border = g === 'female' ? '2px solid var(--primary)' : 'none';
-        }
-
-        function setUnit(type, unit) {
-            units[type] = unit;
-            const btns = event.target.parentElement.querySelectorAll('.toggle-btn');
-            btns.forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        function updateAge(val) {
-            document.getElementById('age-display').innerText = val;
-        }
-
-        function showScreen(screenId, navEl) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            if(navEl) {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                navEl.classList.add('active');
-            }
-            if(screenId === 'stats-screen') initCharts();
-        }
-
-        function calculateBMI() {
-            let weight = parseFloat(document.getElementById('weight-input').value);
-            let height = parseFloat(document.getElementById('height-input').value);
-
-            // Convert to metric for calculation
-            if(units.weight === 'lb') weight = weight * 0.453592;
-            if(units.height === 'ft') height = height * 30.48; // Simplified ft to cm
-
-            const bmi = (weight / ((height/100) ** 2)).toFixed(1);
-            displayResult(bmi);
-        }
-
-        function displayResult(bmi) {
-            const valEl = document.getElementById('res-value');
-            const catEl = document.getElementById('res-category');
-            const ring = document.getElementById('bmi-ring');
-            
-            valEl.innerText = bmi;
-            let color = '';
-            let cat = '';
-
-            if(bmi < 18.5) { cat = 'Underweight'; color = '#60a5fa'; }
-            else if(bmi < 25) { cat = 'Normal'; color = '#22c55e'; }
-            else if(bmi < 30) { cat = 'Overweight'; color = '#eab308'; }
-            else { cat = 'Obese'; color = '#ef4444'; }
-
-            catEl.innerText = cat;
-            catEl.style.color = color;
-            ring.style.borderColor = color;
-            showScreen('result-screen');
-        }
-
-        function saveRecord() {
-            const record = {
-                date: new Date().toLocaleDateString('en-US', {month: 'short', day: 'numeric'}),
-                weight: parseFloat(document.getElementById('weight-input').value),
-                bmi: parseFloat(document.getElementById('res-value').innerText)
-            };
-            history.push(record);
-            if(history.length > 7) history.shift(); // Keep last 7 entries
-            localStorage.setItem('healthHistory', JSON.stringify(history));
-            alert("Progress Saved!");
-            showScreen('stats-screen');
-        }
-
-        let weightChart, bmiChart;
-        function initCharts() {
-            const ctxW = document.getElementById('weightChart').getContext('2d');
-            const ctxB = document.getElementById('bmiChart').getContext('2d');
-            
-            const labels = history.map(h => h.date);
-            const weights = history.map(h => h.weight);
-            const bmis = history.map(h => h.bmi);
-
-            if(weightChart) weightChart.destroy();
-            if(bmiChart) bmiChart.destroy();
-
-            const commonOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } }
-            };
-
-            weightChart = new Chart(ctxW, {
-                type: 'line',
-                data: { labels, datasets: [{ data: weights, borderColor: '#f97316', tension: 0.4, fill: true, backgroundColor: 'rgba(249, 115, 22, 0.1)' }] },
-                options: commonOptions
-            });
-
-            bmiChart = new Chart(ctxB, {
-                type: 'line',
-                data: { labels, datasets: [{ data: bmis, borderColor: '#6366f1', tension: 0.4, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] },
-                options: commonOptions
-            });
-        }
-    </script>
+    <!-- App Script -->
+    <script src="script.js"></script>
 </body>
-</html>
-
+        </html>
