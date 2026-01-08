@@ -1,26 +1,30 @@
+// 1. App State
 const state = {
     weight: 0, height: 0, age: 0, gender: 'Male',
     wUnit: 'kg', hUnit: 'cm',
     history: JSON.parse(localStorage.getItem('health_logs')) || []
 };
 
-// Initialize icons immediately
+// 2. Initialize Lucide Icons
 if (typeof lucide !== 'undefined') {
     lucide.createIcons();
 }
 
-// Attach all functions to window to make them globally accessible
-window.showError = function(reason) {
-    document.getElementById('error-reason').innerText = reason;
-    document.getElementById('error-modal').style.display = 'flex';
-};
-
-window.showSuccess = function() {
-    document.getElementById('success-modal').style.display = 'flex';
+// 3. Global Functions (Attached to window so HTML can see them)
+window.enterApp = function() {
+    const landing = document.getElementById('landing-page');
+    if (landing) {
+        landing.classList.add('fade-out');
+        setTimeout(() => {
+            landing.style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+        }, 500);
+    }
 };
 
 window.closeModal = function(id) {
-    document.getElementById(id).style.display = 'none';
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
 };
 
 window.toggleTheme = function() {
@@ -30,14 +34,6 @@ window.toggleTheme = function() {
     });
     lucide.createIcons();
     if (document.getElementById('screen-stats').classList.contains('active')) renderCharts();
-};
-
-window.enterApp = function() {
-    document.getElementById('landing-page').classList.add('fade-out');
-    setTimeout(() => {
-        document.getElementById('landing-page').style.display = 'none';
-        document.getElementById('main-app').style.display = 'flex';
-    }, 500);
 };
 
 window.toggleWeightUnit = function() {
@@ -66,10 +62,15 @@ window.setGender = function(g) {
 
 window.showScreen = function(id, navEl) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    
     document.querySelectorAll('.nav-item').forEach(n => {
         n.classList.remove('active');
-        if (n.getAttribute('onclick').includes(id)) n.classList.add('active');
+        // Check if the nav item's onclick matches the screen ID
+        if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) {
+            n.classList.add('active');
+        }
     });
     if(id === 'screen-stats') renderCharts();
 };
@@ -80,9 +81,9 @@ window.handleCalculate = function() {
     const wIn = parseFloat(wVal);
     const hIn = parseFloat(hVal);
 
-    if (!wVal || wIn <= 0) return showError("Reason: Invalid Weight. Please Enter correct data.");
-    if (!hVal || hIn <= 0) return showError("Reason: Invalid Height. Please Enter correct data.");
-    if (state.age <= 0) return showError("Reason: Invalid Age. Please Enter correct data.");
+    if (!wVal || wIn <= 0) return showError("Invalid Weight. Please enter a positive number.");
+    if (!hVal || hIn <= 0) return showError("Invalid Height. Please enter a positive number.");
+    if (state.age <= 0) return showError("Invalid Age. Please select DOB or enter age.");
 
     state.weight = wIn; state.height = hIn;
     let w = state.wUnit === 'lb' ? wIn / 2.20462 : wIn;
@@ -90,8 +91,31 @@ window.handleCalculate = function() {
     let bmi = (w / ((h/100)**2)).toFixed(1);
     
     updateResultScreen(bmi, w, h);
-    showScreen('screen-result');
+    window.showScreen('screen-result');
 };
+
+window.saveData = function() {
+    const bmiVal = document.getElementById('bmi-val').innerText;
+    const entry = {
+        date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric'}),
+        bmi: parseFloat(bmiVal),
+        weight: state.wUnit === 'lb' ? state.weight / 2.20462 : state.weight,
+        meta: document.getElementById('bmi-meta').innerText
+    };
+    state.history.push(entry);
+    localStorage.setItem('health_logs', JSON.stringify(state.history));
+    document.getElementById('success-modal').style.display = 'flex';
+};
+
+// 4. Internal Helper Functions
+function showError(reason) {
+    const errorModal = document.getElementById('error-modal');
+    const reasonText = document.getElementById('error-reason');
+    if (errorModal && reasonText) {
+        reasonText.innerText = reason;
+        errorModal.style.display = 'flex';
+    }
+}
 
 function updateResultScreen(bmi, w, h) {
     document.getElementById('bmi-val').innerText = bmi;
@@ -110,28 +134,18 @@ function updateResultScreen(bmi, w, h) {
     ];
 
     const table = document.getElementById('classification-table');
-    table.innerHTML = '';
-    classes.forEach(c => {
-        const active = bmi >= c.m && bmi < c.x;
-        if(active) document.getElementById('bmi-cat').innerText = c.n;
-        table.innerHTML += `<div class="info-row ${active?'active':''}"><span>${c.n}</span><span>${c.v}</span></div>`;
-    });
+    if (table) {
+        table.innerHTML = '';
+        classes.forEach(c => {
+            const active = bmi >= c.m && bmi < c.x;
+            if(active) document.getElementById('bmi-cat').innerText = c.n;
+            table.innerHTML += `<div class="info-row ${active?'active':''}"><span>${c.n}</span><span>${c.v}</span></div>`;
+        });
+    }
 }
 
-window.saveData = function() {
-    const entry = {
-        date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric'}),
-        bmi: parseFloat(document.getElementById('bmi-val').innerText),
-        weight: state.wUnit === 'lb' ? state.weight / 2.20462 : state.weight,
-        meta: document.getElementById('bmi-meta').innerText
-    };
-    state.history.push(entry);
-    localStorage.setItem('health_logs', JSON.stringify(state.history));
-    showSuccess();
-};
-
 function renderCharts() {
-    if(!window.Chart) return;
+    if (!window.Chart) return;
     const isLight = document.body.classList.contains('light-mode');
     const color = isLight ? '#1c222d' : '#ffffff';
     
@@ -145,32 +159,46 @@ function renderCharts() {
         scales: { x: { ticks: { color } }, y: { ticks: { color }, beginAtZero: true } }
     };
 
-    if (window.bC) window.bC.destroy();
-    window.bC = new Chart(document.getElementById('chart-bmi'), {
-        type: 'line', data: { labels, datasets: [{ data: bmiVals, borderColor: '#536dfe', tension: 0.4, pointRadius: 6 }] }, options
-    });
+    const ctxBmi = document.getElementById('chart-bmi');
+    if (ctxBmi) {
+        if (window.bC) window.bC.destroy();
+        window.bC = new Chart(ctxBmi, {
+            type: 'line', data: { labels, datasets: [{ data: bmiVals, borderColor: '#536dfe', tension: 0.4, pointRadius: 6 }] }, options
+        });
+    }
 
-    if (window.wC) window.wC.destroy();
-    window.wC = new Chart(document.getElementById('chart-weight'), {
-        type: 'line', data: { labels, datasets: [{ data: weightVals, borderColor: '#ff9100', tension: 0.4 }] }, options: { ...options, onClick: null }
-    });
+    const ctxWeight = document.getElementById('chart-weight');
+    if (ctxWeight) {
+        if (window.wC) window.wC.destroy();
+        window.wC = new Chart(ctxWeight, {
+            type: 'line', data: { labels, datasets: [{ data: weightVals, borderColor: '#ff9100', tension: 0.4 }] }, options: { ...options }
+        });
+    }
 }
 
-// Event listeners for inputs (these run automatically)
-window.onload = function() {
-    document.getElementById('dob-input').addEventListener('change', function() {
-        const birthDate = new Date(this.value);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) age--;
-        state.age = age;
-        document.getElementById('age-manual').value = "";
-        document.getElementById('age-display').innerText = `Age: ${age} yrs`;
-    });
+// 5. DOM Listeners (Run after page load)
+window.addEventListener('DOMContentLoaded', () => {
+    const dobInput = document.getElementById('dob-input');
+    const ageManual = document.getElementById('age-manual');
+    const ageDisplay = document.getElementById('age-display');
 
-    document.getElementById('age-manual').addEventListener('input', function() {
-        state.age = parseInt(this.value) || 0;
-        document.getElementById('dob-input').value = "";
-        document.getElementById('age-display').innerText = `Age: ${state.age} yrs`;
-    });
-};
+    if (dobInput) {
+        dobInput.addEventListener('change', function() {
+            const birthDate = new Date(this.value);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) age--;
+            state.age = age;
+            if (ageManual) ageManual.value = "";
+            if (ageDisplay) ageDisplay.innerText = `Age: ${age} yrs`;
+        });
+    }
+
+    if (ageManual) {
+        ageManual.addEventListener('input', function() {
+            state.age = parseInt(this.value) || 0;
+            if (dobInput) dobInput.value = "";
+            if (ageDisplay) ageDisplay.innerText = `Age: ${state.age} yrs`;
+        });
+    }
+});
