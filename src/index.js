@@ -4,79 +4,67 @@ const state = {
     history: JSON.parse(localStorage.getItem('health_logs')) || []
 };
 
-lucide.createIcons();
+// Initialize icons immediately
+if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+}
 
-function showError(reason) {
+// Attach all functions to window to make them globally accessible
+window.showError = function(reason) {
     document.getElementById('error-reason').innerText = reason;
     document.getElementById('error-modal').style.display = 'flex';
-}
+};
 
-function showSuccess() {
+window.showSuccess = function() {
     document.getElementById('success-modal').style.display = 'flex';
-}
+};
 
-function closeModal(id) {
+window.closeModal = function(id) {
     document.getElementById(id).style.display = 'none';
-}
+};
 
-function toggleTheme() {
+window.toggleTheme = function() {
     const isLight = document.body.classList.toggle('light-mode');
     document.querySelectorAll('.theme-toggle').forEach(i => {
         i.setAttribute('data-lucide', isLight ? 'moon' : 'sun');
     });
     lucide.createIcons();
     if (document.getElementById('screen-stats').classList.contains('active')) renderCharts();
-}
+};
 
-function enterApp() {
+window.enterApp = function() {
     document.getElementById('landing-page').classList.add('fade-out');
     setTimeout(() => {
         document.getElementById('landing-page').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
     }, 500);
-}
+};
 
-function toggleWeightUnit() {
+window.toggleWeightUnit = function() {
     const input = document.getElementById('weight-in');
     let val = parseFloat(input.value) || 0;
     state.wUnit = state.wUnit === 'kg' ? 'lb' : 'kg';
     if(val !== 0) input.value = state.wUnit === 'lb' ? (val * 2.20462).toFixed(2) : (val / 2.20462).toFixed(2);
     document.getElementById('unit-kg').classList.toggle('active', state.wUnit === 'kg');
     document.getElementById('unit-lb').classList.toggle('active', state.wUnit === 'lb');
-}
+};
 
-function toggleHeightUnit() {
+window.toggleHeightUnit = function() {
     const input = document.getElementById('height-in');
     let val = parseFloat(input.value) || 0;
     state.hUnit = state.hUnit === 'cm' ? 'ft' : 'cm';
     if(val !== 0) input.value = state.hUnit === 'ft' ? (val / 30.48).toFixed(2) : (val * 30.48).toFixed(1);
     document.getElementById('unit-cm').classList.toggle('active', state.hUnit === 'cm');
     document.getElementById('unit-ft').classList.toggle('active', state.hUnit === 'ft');
-}
+};
 
-document.getElementById('dob-input').addEventListener('change', function() {
-    const birthDate = new Date(this.value);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) age--;
-    state.age = age;
-    document.getElementById('age-manual').value = "";
-    document.getElementById('age-display').innerText = `Age: ${age} yrs`;
-});
-
-document.getElementById('age-manual').addEventListener('input', function() {
-    state.age = parseInt(this.value) || 0;
-    document.getElementById('dob-input').value = "";
-    document.getElementById('age-display').innerText = `Age: ${state.age} yrs`;
-});
-
-function setGender(g) {
+window.setGender = function(g) {
     state.gender = g;
     document.getElementById('g-male').classList.toggle('active', g === 'Male');
     document.getElementById('g-female').classList.toggle('active', g === 'Female');
-}
+};
 
-function showScreen(id, navEl) {
+window.showScreen = function(id, navEl) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n => {
@@ -84,9 +72,9 @@ function showScreen(id, navEl) {
         if (n.getAttribute('onclick').includes(id)) n.classList.add('active');
     });
     if(id === 'screen-stats') renderCharts();
-}
+};
 
-function handleCalculate() {
+window.handleCalculate = function() {
     const wVal = document.getElementById('weight-in').value;
     const hVal = document.getElementById('height-in').value;
     const wIn = parseFloat(wVal);
@@ -103,13 +91,12 @@ function handleCalculate() {
     
     updateResultScreen(bmi, w, h);
     showScreen('screen-result');
-}
+};
 
 function updateResultScreen(bmi, w, h) {
     document.getElementById('bmi-val').innerText = bmi;
     document.getElementById('bmi-meta').innerText = `${w.toFixed(1)}kg | ${h.toFixed(0)}cm | ${state.gender} | ${state.age}yrs`;
     
-    // Age-based WHO Standards
     let classes = state.age >= 20 ? [
         {n: 'Underweight', v: '< 18.5', m: 0, x: 18.5},
         {n: 'Normal', v: '18.5-24.9', m: 18.5, x: 25},
@@ -131,7 +118,7 @@ function updateResultScreen(bmi, w, h) {
     });
 }
 
-function saveData() {
+window.saveData = function() {
     const entry = {
         date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric'}),
         bmi: parseFloat(document.getElementById('bmi-val').innerText),
@@ -141,13 +128,13 @@ function saveData() {
     state.history.push(entry);
     localStorage.setItem('health_logs', JSON.stringify(state.history));
     showSuccess();
-}
+};
 
 function renderCharts() {
+    if(!window.Chart) return;
     const isLight = document.body.classList.contains('light-mode');
     const color = isLight ? '#1c222d' : '#ffffff';
     
-    // Only plotting what is explicitly in the history (saved data)
     const dataPoints = state.history.slice(-7);
     const labels = dataPoints.length > 0 ? dataPoints.map(d => d.date) : ["No Saved Data"];
     const bmiVals = dataPoints.length > 0 ? dataPoints.map(d => d.bmi) : [0];
@@ -155,13 +142,7 @@ function renderCharts() {
 
     const options = {
         plugins: { legend: false },
-        scales: { x: { ticks: { color } }, y: { ticks: { color }, beginAtZero: true } },
-        onClick: (e, elements) => {
-            if (elements.length > 0 && dataPoints.length > 0) {
-                const rec = dataPoints[elements[0].index];
-                document.getElementById('plot-detail-box').innerHTML = `<strong>${rec.bmi} BMI</strong> | ${rec.meta}`;
-            }
-        }
+        scales: { x: { ticks: { color } }, y: { ticks: { color }, beginAtZero: true } }
     };
 
     if (window.bC) window.bC.destroy();
@@ -174,3 +155,22 @@ function renderCharts() {
         type: 'line', data: { labels, datasets: [{ data: weightVals, borderColor: '#ff9100', tension: 0.4 }] }, options: { ...options, onClick: null }
     });
 }
+
+// Event listeners for inputs (these run automatically)
+window.onload = function() {
+    document.getElementById('dob-input').addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) age--;
+        state.age = age;
+        document.getElementById('age-manual').value = "";
+        document.getElementById('age-display').innerText = `Age: ${age} yrs`;
+    });
+
+    document.getElementById('age-manual').addEventListener('input', function() {
+        state.age = parseInt(this.value) || 0;
+        document.getElementById('dob-input').value = "";
+        document.getElementById('age-display').innerText = `Age: ${state.age} yrs`;
+    });
+};
