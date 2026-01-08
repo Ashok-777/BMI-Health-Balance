@@ -147,35 +147,35 @@ The project will open automatically in your browser and reload on changes.
 
 4. How to Use:
    
--Input Data
+- Input Data
 
--Enter weight and height
+- Enter weight and height
 
--Toggle between kg / lb and cm / ft
+- Toggle between kg / lb and cm / ft
 
--Select Age
+- Select Age
 
--Use the calendar (Date of Birth) for accuracy
+- Use the calendar (Date of Birth) for accuracy
 
--Or use manual age input for speed
+- Or use manual age input for speed
 
--Gender Selection
+- Gender Selection
 
--Select Male or Female for metadata tracking
+- Select Male or Female for metadata tracking
 
--View BMI Result
+- View BMI Result
 
--See BMI value
+- See BMI value
 
--Health category
+- Health category
 
--WHO reference table
+- WHO reference table
 
--Save & Track
+- Save & Track
 
--Save records
+- Save records
 
--Explore trends in the Statistics tab
+- Explore trends in the Statistics tab
 
 🚀 Deployment
 
