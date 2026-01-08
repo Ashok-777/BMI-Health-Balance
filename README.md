@@ -142,7 +142,7 @@ The project will open automatically in your browser and reload on changes.
 
 ---
 
-4. How to Use:
+## 4. How to Use:
    
 - Input Data
 
@@ -176,11 +176,7 @@ The project will open automatically in your browser and reload on changes.
 
 ---
 
-🚀 Deployment
-
-This project is deployed using Vercel.
-
-🔗 Live Demo: 🚀 Deployment
+## 🚀 Deployment
 
 This project is deployed using Vercel.
 
