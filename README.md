@@ -129,8 +129,6 @@ cd BMI-Health-Balance
 
 > ✅ The app loads instantly. Enter your details and start tracking your health journey.
 
----
-
 ## 3. Optional: Run via Local Server
 
 Using a local server is recommended for live editing and development:
@@ -144,6 +142,8 @@ live-server
 ```
 
 The project will open automatically in your browser and reload on changes.
+
+---
 
 4. How to Use:
    
@@ -177,10 +177,16 @@ The project will open automatically in your browser and reload on changes.
 
 - Explore trends in the Statistics tab
 
+---
+
 🚀 Deployment
 
 This project is deployed using Vercel.
 
 🔗 Live Demo: (WORK IN PROGRESS)
 
+---
+
 <p align="center">© Ashok-777 | Crafted with ❤️ and curiosity</p>
+
+---
