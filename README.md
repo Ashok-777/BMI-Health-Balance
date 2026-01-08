@@ -1,6 +1,3 @@
-# BMI-Health-Balance
- WORK IN PROGRESS 
-
 # ⚖️ BMI Health Balance
 
 A sophisticated, client-side **BMI Health Balance** application designed to calculate, track, and manage **Body Mass Index (BMI)** with precision. It supports **multiple measurement units**, applies **age-specific WHO classifications**, and provides **interactive historical analytics** for long-term health monitoring.
