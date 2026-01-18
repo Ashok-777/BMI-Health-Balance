@@ -180,8 +180,7 @@ The project will open automatically in your browser and reload on changes.
 
 This project is deployed using Vercel.
 
-🔗 **Live Demo**: [BMI Health Balance](https://bmi-health-balance.vercel.app/) (WORK IN PROGRESS)
-
+🔗 **Live Demo**: [BMI Health Balance](https://bmi-health-balance.vercel.app/)
 ---
 
 <p align="center">© Ashok-777 | Crafted with ❤️ and curiosity</p>
