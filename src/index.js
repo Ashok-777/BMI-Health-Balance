@@ -1,3 +1,5 @@
+/* © Ashok-777 */
+/* GitHub: https://github.com/Ashok-777 */
 // 1. App State
 const state = {
     weight: 0, height: 0, age: 0, gender: 'Male',
@@ -202,3 +204,5 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+/* © Ashok-777 */
+/* GitHub: https://github.com/Ashok-777 */
